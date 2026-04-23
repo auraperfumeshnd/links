@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aura Perfumes | Links</title>
 
-    <!-- Ícone da Aba do Navegador (Gotinha Dourada) -->
+    <!-- Ícone da Aba do Navegador -->
     <link rel="icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234C1D95' rx='112'/%3E%3Cpath fill='%23EAB308' d='M256 96c-61.9 0-112 50.1-112 112 0 61.9 112 208 112 208s112-146.1 112-208c0-61.9-50.1-112-112-112zm0 160c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48z'/%3E%3C/svg%3E">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Biblioteca de Ícones -->
+    <!-- Biblioteca de Ícones e Tailwind -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -22,10 +22,10 @@
                 extend: {
                     colors: {
                         hinode: {
-                            roxo: '#4C1D95',     /* Roxo profundo */
-                            roxoLight: '#6D28D9',/* Roxo vibrante */
-                            amarelo: '#EAB308',  /* Amarelo dourado */
-                            fundo: '#F8FAFC',    /* Fundo branco/gelo */
+                            roxo: '#4C1D95',     
+                            roxoLight: '#6D28D9',
+                            amarelo: '#EAB308',  
+                            fundo: '#F8FAFC',    
                         }
                     },
                     fontFamily: {
@@ -41,66 +41,66 @@
         body { background-color: theme('colors.hinode.fundo'); font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
         h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; }
         .dot-pattern { background-image: radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px); background-size: 20px 20px; }
-        @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         
-        /* Ocultar barra de rolagem mas permitir o scroll nas ofertas horizontais */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Garante que pare em cada card obrigatoriamente */
         .snap-always { scroll-snap-stop: always; }
-        #loader { transition: opacity 0.3s ease; }
         img { image-rendering: -webkit-optimize-contrast; }
+
+        /* Abas do Admin */
+        .admin-tab { border-bottom: 3px solid transparent; transition: all 0.3s ease; opacity: 0.6; border-radius: 0.5rem 0.5rem 0 0; }
+        .admin-tab:hover { opacity: 0.8; background-color: theme('colors.gray.50'); }
+        .admin-tab.active { border-bottom: 3px solid theme('colors.hinode.amarelo'); color: theme('colors.hinode.roxo'); font-weight: 800; opacity: 1; background-color: theme('colors.purple.50'); }
     </style>
 </head>
 <body class="text-gray-800 relative min-h-screen overflow-x-hidden w-full">
 
     <!-- LOADER -->
-    <div id="loader" class="fixed inset-0 bg-hinode-roxo/95 z-[9999] flex-col items-center justify-center backdrop-blur-sm" style="display: none; opacity: 0;">
+    <div id="loader" class="fixed inset-0 bg-hinode-roxo/95 z-[9999] flex flex-col items-center justify-center backdrop-blur-sm transition-opacity duration-300">
         <i class="ph ph-spinner-gap animate-spin text-6xl text-hinode-amarelo mb-4"></i>
-        <p class="text-2xl font-bold text-white font-heading text-center">Carregando...</p>
+        <p class="text-2xl font-bold text-white font-heading text-center" id="loader-text">Carregando...</p>
     </div>
 
     <!-- TOAST MSG -->
     <div id="toast" class="fixed top-5 right-5 transform translate-x-full opacity-0 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-[10000] flex items-center gap-2">
-        <i class="ph-fill ph-check-circle text-xl"></i>
+        <i class="ph-fill ph-check-circle text-xl" id="toast-icon"></i>
         <span id="toast-msg">Salvo com sucesso!</span>
     </div>
 
-    <!-- DELETE MODAL -->
-    <div id="delete-modal" class="fixed inset-0 bg-hinode-roxo/90 z-[10001] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl p-6 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300">
-            <div class="flex items-center justify-center mb-4">
-                <i class="ph-fill ph-warning-circle text-6xl text-red-500"></i>
-            </div>
-            <h3 class="text-xl font-bold text-hinode-roxo text-center font-heading mb-2">Excluir Item?</h3>
-            <p class="text-gray-500 text-sm mb-6 text-center">Tem certeza que deseja excluir esta opção? Lembre-se de clicar em "Salvar" depois no painel.</p>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">Cancelar</button>
-                <button onclick="executeDelete()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-md">Sim, excluir</button>
-            </div>
+    <!-- MODAL CUSTOMIZADO GERAL -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-hinode-roxo/90 z-[10001] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="custom-modal-content">
+            <div id="custom-modal-icon" class="mb-4 text-center"></div>
+            <h3 id="custom-modal-title" class="text-xl font-bold text-hinode-roxo mb-2 text-center font-heading">Título</h3>
+            <p id="custom-modal-message" class="text-gray-500 text-sm mb-6 text-center">Mensagem</p>
+            <div id="custom-modal-actions" class="flex justify-end gap-3 flex-col sm:flex-row"></div>
         </div>
     </div>
 
     <!-- PRODUCT MODAL (PÚBLICO) -->
     <div id="product-modal" class="fixed inset-0 bg-white z-[10005] hidden flex-col overflow-y-auto">
         <div class="sticky top-0 bg-white z-20 px-4 py-4 flex justify-between items-center border-b shadow-sm">
-            <h2 id="modal-product-title" class="font-bold text-lg text-hinode-roxo font-heading line-clamp-1 pr-4">Nome do Produto</h2>
-            <button onclick="closeProductModal()" class="p-2 text-gray-500 hover:text-hinode-roxo bg-gray-100 rounded-full transition-colors"><i class="ph-bold ph-x"></i></button>
+            <h2 id="modal-product-title" class="font-bold text-lg text-hinode-roxo font-heading line-clamp-1 pr-4">Nome do Perfume</h2>
+            <button onclick="window.closePublicProductModal()" class="p-2 text-gray-500 hover:text-hinode-roxo bg-gray-100 rounded-full transition-colors"><i class="ph-bold ph-x text-xl"></i></button>
         </div>
         
         <div class="p-4 pb-24 max-w-lg mx-auto w-full">
-            <div class="relative w-full h-72 mb-6 bg-purple-50 rounded-3xl border border-purple-100 overflow-hidden">
-                <div id="modal-product-img-container" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scroll relative z-10"></div>
-                <div id="modal-swipe-indicator" class="absolute bottom-2 right-2 z-20 bg-hinode-roxo/60 text-white font-bold text-[10px] px-3 py-1 rounded-full pointer-events-none hidden backdrop-blur-sm tracking-widest uppercase">Arraste ➔</div>
+            <div class="relative w-full h-72 mb-6 bg-purple-50 rounded-3xl border border-purple-100 overflow-hidden flex items-center justify-center p-4">
+                <img id="modal-product-img" src="" class="w-full h-full object-contain" alt="Produto">
             </div>
 
             <div class="mb-8">
-                <h3 class="font-bold text-xl text-hinode-roxo font-heading mb-3 flex items-center gap-2"><i class="ph-fill ph-list-dashes text-hinode-amarelo"></i> Detalhes do Produto</h3>
-                <div id="modal-product-details" class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">Detalhes aqui...</div>
+                <h3 class="font-bold text-xl text-hinode-roxo font-heading mb-3 flex items-center gap-2"><i class="ph-fill ph-list-dashes text-hinode-amarelo"></i> Detalhes da Fragrância</h3>
+                <!-- Aqui entra o conteúdo harmonizado dinamicamente pelo JS -->
+                <div id="modal-product-details" class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    Detalhes aqui...
+                </div>
             </div>
 
             <div class="flex flex-col gap-3">
@@ -118,13 +118,13 @@
                 <h3 class="text-xl font-bold text-hinode-roxo font-heading flex items-center gap-2">
                     <i class="ph-fill ph-whatsapp-logo text-[#25D366] text-2xl"></i> Fale Conosco
                 </h3>
-                <button onclick="closeLeadModal()" class="text-gray-400 hover:text-hinode-roxo bg-gray-100 p-1.5 rounded-full transition-colors"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="window.closeLeadModal()" class="text-gray-400 hover:text-hinode-roxo bg-gray-100 p-1.5 rounded-full transition-colors"><i class="ph-bold ph-x text-lg"></i></button>
             </div>
             
             <div id="lead-time-status" class="mb-4 text-xs font-medium p-3 rounded-xl flex items-start gap-2"></div>
 
             <p class="text-sm text-gray-500 mb-4" id="lead-modal-desc">Por favor, informe seus dados para agilizarmos o seu atendimento.</p>
-            <p id="lead-error" class="text-red-500 text-xs font-bold hidden mb-3 bg-red-50 p-2 rounded-lg"></p>
+            <p id="lead-error" class="text-red-500 text-xs font-bold hidden mb-3 bg-red-50 p-3 rounded-xl border border-red-100"></p>
 
             <div class="space-y-4">
                 <div>
@@ -132,16 +132,16 @@
                     <input type="text" id="lead-name" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-white transition-colors" placeholder="Como gosta de ser chamado?">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localidade (Cidade/Bairro) <span class="text-red-500">*</span></label>
-                    <input type="text" id="lead-location" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-white transition-colors" placeholder="Ex: Centro, São Paulo">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localidade (Cidade) <span class="text-red-500">*</span></label>
+                    <input type="text" id="lead-location" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-white transition-colors" placeholder="Ex: São Paulo">
                 </div>
                 <div id="lead-subject-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">O que deseja? <span class="text-red-500">*</span></label>
-                    <textarea id="lead-subject" rows="2" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-white transition-colors" placeholder="Ex: Gostaria de saber valores, fazer um pedido..."></textarea>
+                    <textarea id="lead-subject" rows="2" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-white transition-colors" placeholder="Ex: Quero fazer um pedido..."></textarea>
                 </div>
             </div>
 
-            <button onclick="submitLeadModal()" class="w-full mt-6 bg-hinode-amarelo text-hinode-roxo font-extrabold py-4 rounded-xl shadow-lg transition-transform hover:brightness-105 flex justify-center items-center gap-2">
+            <button onclick="window.submitLeadModal()" class="w-full mt-6 bg-hinode-amarelo text-hinode-roxo font-extrabold py-4 rounded-xl shadow-lg transition-transform hover:brightness-105 flex justify-center items-center gap-2">
                 Iniciar Conversa <i class="ph-bold ph-paper-plane-right text-lg"></i>
             </button>
         </div>
@@ -185,10 +185,12 @@
                 </a>
             </div>
 
+            <!-- CATÁLOGO HORIZONTAL (CARROSSEL) -->
             <div class="w-full mb-8 overflow-hidden" id="pub-offers-section">
-                <h3 class="text-xl font-bold text-hinode-roxo font-heading mb-4 px-6">Ofertas em Destaque</h3>
-                
-                <div id="pub-offers-container" class="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 hide-scroll"></div>
+                <h3 class="text-xl font-bold text-hinode-roxo font-heading mb-4 px-6">Catálogo em Destaque</h3>
+                <div id="pub-offers-container" class="flex overflow-x-auto snap-x snap-mandatory hide-scroll gap-4 px-6 pb-6 pt-2">
+                    <!-- Cards inseridos via JS -->
+                </div>
             </div>
 
             <div class="w-full mb-8 px-6">
@@ -199,7 +201,7 @@
         </main>
 
         <footer class="text-center pb-8 opacity-40 hover:opacity-100 transition-opacity mt-4">
-            <button onclick="switchView('login')" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-center gap-1 mx-auto px-4 py-2 rounded-full hover:text-hinode-roxo transition-colors">
+            <button onclick="window.switchView('login')" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-center gap-1 mx-auto px-4 py-2 rounded-full hover:text-hinode-roxo transition-colors">
                 <i class="ph-fill ph-lock-key"></i> Acesso Lojista
             </button>
         </footer>
@@ -208,7 +210,7 @@
 
     <!-- ==================== TELA DE LOGIN ==================== -->
     <div id="view-login" class="hidden min-h-screen bg-hinode-fundo flex-col items-center justify-center px-4 relative">
-        <button onclick="switchView('public')" class="absolute top-6 left-6 text-gray-400 hover:text-hinode-roxo bg-white p-3 rounded-full shadow-sm transition-colors">
+        <button onclick="window.switchView('public')" class="absolute top-6 left-6 text-gray-400 hover:text-hinode-roxo bg-white p-3 rounded-full shadow-sm transition-colors">
             <i class="ph-bold ph-arrow-left text-xl"></i>
         </button>
 
@@ -219,11 +221,11 @@
                 </div>
             </div>
             <h2 class="text-2xl font-bold text-center text-hinode-roxo font-heading mb-2">Painel Lojista</h2>
-            <p class="text-center text-sm text-gray-500 mb-6">Acesse para gerenciar seu Link na Bio</p>
+            <p class="text-center text-sm text-gray-500 mb-6">Acesse para gerenciar sua Bio</p>
 
             <p id="login-error-msg" class="text-red-500 text-xs font-bold text-center mb-4 hidden bg-red-50 p-3 rounded-xl border border-red-100"></p>
 
-            <form id="login-form" onsubmit="loginAdmin(event)">
+            <form id="login-form" onsubmit="window.loginAdmin(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">E-mail</label>
                     <div class="relative">
@@ -252,16 +254,16 @@
         <!-- HEADER ADMIN -->
         <header class="bg-white border-b border-gray-200 p-4 shadow-sm z-50 flex justify-between items-center flex-shrink-0">
             <h1 class="font-extrabold text-lg sm:text-xl text-hinode-roxo font-heading flex items-center gap-2">
-                <i class="ph-fill ph-storefront text-hinode-amarelo"></i> Gestão de Link
+                <i class="ph-fill ph-storefront text-hinode-amarelo"></i> Gestão do Link
             </h1>
             <div class="flex gap-2">
-                <button onclick="switchView('public')" class="text-gray-500 hover:text-hinode-roxo bg-gray-100 hover:bg-purple-50 p-2 rounded-lg text-sm transition-colors" title="Ver Link Público">
+                <button onclick="window.switchView('public')" class="text-gray-500 hover:text-hinode-roxo bg-gray-100 hover:bg-purple-50 p-2 rounded-lg text-sm transition-colors" title="Ver Link Público">
                     <i class="ph-bold ph-eye text-xl"></i>
                 </button>
-                <button onclick="saveData()" class="bg-hinode-amarelo hover:brightness-105 text-hinode-roxo px-4 py-2 rounded-lg text-sm font-extrabold flex items-center gap-1.5 transition-colors shadow-sm">
+                <button onclick="window.saveData()" class="bg-hinode-amarelo hover:brightness-105 text-hinode-roxo px-4 py-2 rounded-lg text-sm font-extrabold flex items-center gap-1.5 transition-colors shadow-sm">
                     <i class="ph-bold ph-floppy-disk text-lg"></i> Salvar
                 </button>
-                <button onclick="logoutAdmin()" class="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg text-sm font-bold flex items-center transition-colors" title="Sair do Painel">
+                <button onclick="window.logoutAdmin()" class="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg text-sm font-bold flex items-center transition-colors" title="Sair do Painel">
                     <i class="ph-bold ph-sign-out text-xl"></i>
                 </button>
             </div>
@@ -269,36 +271,35 @@
 
         <!-- TABS ADMIN -->
         <div class="flex border-b border-gray-200 bg-white z-40 shadow-sm flex-shrink-0">
-            <button id="tab-btn-config" onclick="switchAdminTab('config')" class="flex-1 py-4 text-sm sm:text-base font-bold border-b-2 border-hinode-roxo text-hinode-roxo transition-colors flex items-center justify-center gap-2">
+            <button id="tab-btn-config" onclick="window.switchAdminTab('config')" class="admin-tab px-4 py-4 text-sm sm:text-base font-bold text-gray-400 whitespace-nowrap flex items-center justify-center gap-2">
                 <i class="ph-fill ph-gear text-lg"></i> Configurações
             </button>
-            <button id="tab-btn-catalog" onclick="switchAdminTab('catalog')" class="flex-1 py-4 text-sm sm:text-base font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-colors flex items-center justify-center gap-2">
+            <button id="tab-btn-catalog" onclick="window.switchAdminTab('catalog')" class="admin-tab active px-4 py-4 text-sm sm:text-base font-bold border-b-2 border-hinode-roxo text-hinode-roxo whitespace-nowrap flex items-center justify-center gap-2">
                 <i class="ph-fill ph-perfume text-lg"></i> Produtos <span id="catalog-count-badge" class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
             </button>
         </div>
 
         <!-- CONTEÚDO ADMIN -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto" id="admin-scroll-area">
             
             <!-- TAB: CONFIGURAÇÕES -->
-            <div id="tab-content-config" class="max-w-3xl mx-auto w-full p-4 flex flex-col gap-6 mt-4 mb-10">
+            <div id="tab-content-config" class="hidden max-w-3xl mx-auto w-full p-4 flex-col gap-6 mt-4 mb-10">
                 
                 <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h2 class="font-bold text-hinode-roxo text-lg font-heading mb-4 flex items-center gap-2 border-b border-gray-50 pb-3"><i class="ph-fill ph-image text-hinode-amarelo"></i> 1. Identidade Visual</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-xl border border-gray-100 w-full overflow-hidden">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Foto de Perfil (Redonda)</label>
-                            <!-- Layout flexível para evitar overflow -->
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-xl border border-gray-100 overflow-hidden">
+                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Foto de Perfil</label>
+                            <div class="flex items-center gap-4">
                                 <img id="adm-photo-preview" src="" class="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md bg-white shrink-0">
-                                <input type="file" accept="image/*" class="w-full max-w-full overflow-hidden text-ellipsis block text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-purple-50 file:text-hinode-roxo hover:file:bg-purple-100 cursor-pointer transition-colors" onchange="handleImageUpload(event, 'photoUrl', 'adm-photo-preview')">
+                                <input type="file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-purple-50 file:text-hinode-roxo hover:file:bg-purple-100 cursor-pointer transition-colors" onchange="window.handleImageUpload(event, 'photoUrl', 'adm-photo-preview')">
                             </div>
                         </div>
-                        <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-xl border border-gray-100 w-full overflow-hidden">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Logotipo da Loja (Quadrado)</label>
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-xl border border-gray-100 overflow-hidden">
+                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Logotipo da Loja</label>
+                            <div class="flex items-center gap-4">
                                 <img id="adm-logo-preview" src="" class="w-16 h-16 object-contain border-4 border-white shadow-md bg-white rounded-2xl p-1 shrink-0">
-                                <input type="file" accept="image/*" class="w-full max-w-full overflow-hidden text-ellipsis block text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-gray-200 file:text-gray-700 hover:file:bg-gray-300 cursor-pointer transition-colors" onchange="handleImageUpload(event, 'logoUrl', 'adm-logo-preview')">
+                                <input type="file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-gray-200 file:text-gray-700 hover:file:bg-gray-300 cursor-pointer transition-colors" onchange="window.handleImageUpload(event, 'logoUrl', 'adm-logo-preview')">
                             </div>
                         </div>
                     </div>
@@ -338,7 +339,7 @@
                                 
                                 <label class="relative inline-flex items-center cursor-pointer bg-red-50 px-3 py-1.5 rounded-full border border-red-100 shrink-0 ml-2">
                                     <span class="mr-2 text-[10px] font-bold text-red-600 uppercase tracking-wider">Férias</span>
-                                    <input type="checkbox" id="adm-vacation-mode" class="sr-only peer" onchange="toggleVacationMode()">
+                                    <input type="checkbox" id="adm-vacation-mode" class="sr-only peer" onchange="window.toggleVacationMode()">
                                     <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[8px] after:left-[55px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-500"></div>
                                 </label>
                             </div>
@@ -355,9 +356,7 @@
 
                             <div id="adm-normal-schedule">
                                 <p class="text-[11px] text-gray-500 mb-4 font-medium">Defina os dias e horários em que atende. Desmarque o dia para informar que é folga.</p>
-                                
                                 <div id="adm-schedule-container" class="space-y-2.5 mb-5"></div>
-                                
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Observação (Exibida durante expediente)</label>
                                     <input type="text" id="adm-time-obs" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-hinode-roxo bg-gray-50 transition-colors" placeholder="Ex: Respondemos em até 10 minutos!">
@@ -370,40 +369,82 @@
                 <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-5 border-b border-gray-50 pb-3">
                         <h2 class="font-bold text-hinode-roxo text-lg font-heading flex items-center gap-2"><i class="ph-fill ph-link text-hinode-amarelo"></i> 3. Links Rápidos</h2>
-                        <button onclick="addCategory()" class="bg-hinode-roxo text-white text-xs px-4 py-2 rounded-xl hover:bg-hinode-roxoLight transition-colors font-bold shadow-sm shrink-0">+ Adicionar Botão</button>
+                        <button onclick="window.addCategory()" class="bg-hinode-roxo text-white text-xs px-4 py-2 rounded-xl hover:bg-hinode-roxoLight transition-colors font-bold shadow-sm shrink-0">+ Adicionar Botão</button>
                     </div>
                     <div id="adm-categories-list" class="flex flex-col gap-4"></div>
                 </section>
             </div>
 
             <!-- TAB: CATÁLOGO -->
-            <div id="tab-content-catalog" class="hidden max-w-3xl mx-auto w-full p-4 flex-col gap-4 mt-4 mb-10">
+            <div id="tab-content-catalog" class="flex max-w-3xl mx-auto w-full p-4 flex-col gap-4 mt-4 mb-10">
                 
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-2">
                     <div class="flex flex-col sm:flex-row gap-3 items-center">
                         <div class="relative w-full flex-1">
                             <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                            <input type="text" id="catalog-search" onkeyup="filterCatalog()" placeholder="Buscar produto..." class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl outline-none focus:border-hinode-roxo transition-colors text-sm font-medium">
+                            <input type="text" id="catalog-search" onkeyup="window.filterCatalog()" placeholder="Buscar produto..." class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl outline-none focus:border-hinode-roxo transition-colors text-sm font-medium">
                         </div>
-                        <button onclick="addCatalogItem()" class="w-full sm:w-auto bg-hinode-amarelo text-hinode-roxo px-5 py-3.5 rounded-xl hover:brightness-105 transition-colors font-extrabold shadow-sm whitespace-nowrap flex items-center justify-center gap-2 text-sm">
-                            <i class="ph-bold ph-plus text-lg"></i> Novo
-                        </button>
                     </div>
-                    <p class="text-[11px] text-gray-500 mt-3 px-1 font-medium">Guarde todos os seus produtos aqui. Apenas os produtos com o interruptor <b>"Exibir no Link"</b> ligado aparecerão na página do cliente.</p>
+                    <p class="text-[11px] text-gray-500 mt-3 px-1 font-medium leading-relaxed">
+                        Os produtos abaixo são puxados do seu <b>Quiz</b>. Clique em <b class="text-hinode-roxo">Visibilidade</b> para ativar a exibição no seu Link na Bio e adicionar uma etiqueta promocional. Novos cadastros são feitos pelo painel do Quiz.
+                    </p>
                 </div>
 
-                <div id="adm-catalog-list" class="flex flex-col gap-6"></div>
+                <div class="bg-white border border-gray-100 rounded-2xl shadow-sm pb-10">
+                    <ul id="adm-catalog-list" class="divide-y divide-gray-50 flex flex-col gap-2 p-2"></ul>
+                </div>
 
             </div>
         </div>
-
     </div>
 
-    <!-- SCRIPT FIREBASE E LÓGICA DO LINK NA BIO -->
+    <!-- MODAL CADASTRO PRODUTO ADMIN (APENAS PARA VISIBILIDADE NO LINK) -->
+    <div id="admin-product-modal" class="hidden fixed inset-0 bg-hinode-roxo/95 z-[150] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-3xl shadow-2xl max-h-[95vh] overflow-y-auto relative">
+            <h2 class="text-2xl font-extrabold text-hinode-roxo mb-6 font-heading">Configurar Produto no Link</h2>
+            <input type="hidden" id="prod-id">
+            
+            <!-- BOTÃO INDEPENDENTE: LINK NA BIO -->
+            <div class="mb-6 flex flex-col sm:flex-row gap-6 bg-green-50 p-5 rounded-2xl border border-green-200">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" id="prod-active-link" class="w-6 h-6 accent-[#25D366] rounded cursor-pointer">
+                    <span class="font-bold text-green-900">Exibir no Link na Bio</span>
+                </label>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-[10px] font-bold text-hinode-roxo uppercase tracking-wider mb-1">Etiqueta de Destaque (Apenas para o Link na Bio)</label>
+                <input type="text" id="prod-link-tag" placeholder="Ex: OFERTA" class="w-full border-2 border-purple-200 p-3 rounded-xl text-sm font-bold text-hinode-amarelo bg-white outline-none focus:border-hinode-roxo transition-colors shadow-inner">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Nome do Produto (Editável no Quiz)</label>
+                    <input type="text" id="prod-name" readonly class="w-full border-2 border-gray-100 p-3 rounded-xl text-sm font-bold bg-gray-50 text-gray-500 outline-none cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Família Olfativa (Editável no Quiz)</label>
+                    <input type="text" id="prod-family" readonly class="w-full border-2 border-gray-100 p-3 rounded-xl text-sm font-bold bg-gray-50 text-gray-500 outline-none cursor-not-allowed">
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Detalhes (Editável no Quiz)</label>
+                <textarea id="prod-notes" rows="4" readonly class="w-full border-2 border-gray-100 p-3 rounded-xl text-sm font-medium bg-gray-50 text-gray-500 outline-none cursor-not-allowed"></textarea>
+            </div>
+
+            <div class="flex gap-4 mt-auto">
+                <button id="btn-save-prod" class="flex-1 bg-hinode-roxo text-white font-bold py-4 rounded-xl hover:bg-hinode-roxoLight transition shadow-lg text-lg">Salvar Configuração</button>
+                <button onclick="window.closeAdminProductForm()" class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -422,8 +463,10 @@
         let currentUser = null;
         let currentLeadContext = '';
         let currentLeadData = '';
+        let isInitialLoad = true;
 
-        // LISTA DE ÍCONES ATUALIZADA - Trocamos 'flask' e 'perfume' por opções de Homem e Mulher
+        let allProducts = [];
+
         const availableIcons = [
             { id: 'gender-female', name: 'Feminino (Mulher)' }, 
             { id: 'gender-male', name: 'Masculino (Homem)' }, 
@@ -442,7 +485,6 @@
             photoUrl: "https://images.unsplash.com/photo-1595425970377-c9703bc48b4d?q=80&w=300&auto=format&fit=crop",
             logoUrl: "https://placehold.co/150x150/ffffff/4C1D95?text=AURA",
             whatsapp: "88999990000", instagram: "auraperfumes",
-            catalog: [], 
             categories: [],
             vacationMode: { active: false, returnDate: "" },
             businessHours: {
@@ -459,272 +501,275 @@
 
         let itemToDelete = null;
 
+        // Funções Globais e Seguras
+        window.safeClassToggle = (id, addClasses, removeClasses) => {
+            const el = document.getElementById(id);
+            if(el) {
+                if(addClasses) addClasses.split(' ').forEach(c => { if(c) el.classList.add(c); });
+                if(removeClasses) removeClasses.split(' ').forEach(c => { if(c) el.classList.remove(c); });
+            }
+        };
+
+        window.showModal = function({ title, message, type = 'info', confirmText = 'Entendi', cancelText = null, onConfirm = null }) {
+            const modal = document.getElementById('custom-modal');
+            if (!modal) return;
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-message').innerText = message;
+            
+            const iconEl = document.getElementById('custom-modal-icon');
+            if (type === 'error') iconEl.innerHTML = '<i class="ph-fill ph-warning-circle text-6xl text-red-500"></i>';
+            else if (type === 'warning') iconEl.innerHTML = '<i class="ph-fill ph-warning text-6xl text-yellow-500"></i>';
+            else if (type === 'success') iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-6xl text-green-500"></i>';
+            else iconEl.innerHTML = '<i class="ph-fill ph-info text-6xl text-hinode-roxoLight"></i>';
+            
+            const actionsEl = document.getElementById('custom-modal-actions');
+            actionsEl.innerHTML = '';
+            
+            if (cancelText) {
+                const btnCancel = document.createElement('button');
+                btnCancel.className = 'flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition';
+                btnCancel.innerText = cancelText;
+                btnCancel.onclick = () => window.safeClassToggle('custom-modal', 'hidden', '');
+                actionsEl.appendChild(btnCancel);
+            }
+            const btnConfirm = document.createElement('button');
+            const btnClass = (type === 'error' || type === 'warning') && cancelText ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-hinode-amarelo hover:brightness-105 text-hinode-roxo';
+            btnConfirm.className = `flex-1 font-bold py-3 rounded-xl transition shadow-md ${btnClass}`;
+            btnConfirm.innerText = confirmText;
+            btnConfirm.onclick = () => { window.safeClassToggle('custom-modal', 'hidden', ''); if (onConfirm) onConfirm(); };
+            actionsEl.appendChild(btnConfirm);
+            
+            window.safeClassToggle('custom-modal', 'flex', 'hidden');
+            setTimeout(() => { const c = document.getElementById('custom-modal-content'); if(c) c.classList.remove('scale-95'); }, 10);
+        };
+
+        window.showLoader = function(text = "Carregando...") { 
+            const loaderText = document.getElementById('loader-text');
+            if(loaderText) loaderText.innerText = text; 
+            window.safeClassToggle('loader', 'flex', 'hidden'); 
+            const loader = document.getElementById('loader');
+            if(loader) setTimeout(() => loader.style.opacity = '1', 10); 
+        };
+        
+        window.hideLoader = function() { 
+            const loader = document.getElementById('loader');
+            if(loader) { loader.style.opacity = '0'; setTimeout(() => window.safeClassToggle('loader', 'hidden', 'flex'), 300); }
+        };
+
+        window.maskPhone = function(input) {
+            let val = input.value.replace(/\D/g, '');
+            if(val.length > 11) val = val.slice(0,11);
+            if(val.length > 2) val = `(${val.slice(0,2)}) ${val.slice(2)}`;
+            if(val.length > 10) val = `${val.slice(0,10)}-${val.slice(10)}`;
+            input.value = val;
+        };
+
+        // --- INICIALIZAÇÃO E ROTAS BLINDADAS ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if(window.location.hash === '#admin') {
-                if (user) { hideLoader(); showAdminView(); } 
-                else { hideLoader(); showLoginView(); }
+            if(isInitialLoad) {
+                isInitialLoad = false;
+                if(window.location.hash === '#admin') {
+                    if (user) window.switchView('admin'); 
+                    else window.switchView('login'); 
+                } else {
+                    window.switchView('public');
+                }
+            } else {
+                if(!user && window.location.hash === '#admin') {
+                    window.switchView('login');
+                }
             }
         });
 
+        function loadDataFromFirebase() {
+            onSnapshot(doc(db, 'settings', 'linkNaBio'), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(!data.categories) data.categories = [];
+                    if(!data.vacationMode) data.vacationMode = { active: false, returnDate: "" };
+                    if(!data.businessHours) data.businessHours = appData.businessHours;
+                    appData = data;
+                }
+                
+                if(window.location.hash !== '#admin') {
+                    renderPublicView();
+                } else if (currentUser) {
+                    renderAdminView();
+                }
+            });
+
+            onSnapshot(collection(db, 'products'), (snap) => {
+                allProducts = [];
+                snap.forEach(doc => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+                
+                if(window.location.hash !== '#admin') {
+                    renderPublicView();
+                } else if (currentUser) {
+                    renderAdminCatalog();
+                }
+            });
+        }
+
+        window.switchView = (viewName) => {
+            if (viewName === 'admin') {
+                window.safeClassToggle('view-public', 'hidden', '');
+                window.safeClassToggle('view-login', 'hidden', 'flex');
+                window.safeClassToggle('view-admin', 'flex', 'hidden');
+                window.location.hash = 'admin';
+                window.switchAdminTab('catalog'); 
+            } else if (viewName === 'login') {
+                window.safeClassToggle('view-public', 'hidden', '');
+                window.safeClassToggle('view-admin', 'hidden', 'flex');
+                window.safeClassToggle('view-login', 'flex', 'hidden');
+                window.location.hash = 'admin';
+                window.scrollTo(0, 0);
+            } else {
+                window.safeClassToggle('view-admin', 'hidden', 'flex');
+                window.safeClassToggle('view-login', 'hidden', 'flex');
+                window.safeClassToggle('view-public', 'block', 'hidden');
+                window.location.hash = '';
+                window.scrollTo(0, 0);
+                renderPublicView(); 
+            }
+            window.hideLoader();
+        };
+
+        window.switchAdminTab = (tab) => {
+            const btnConfig = document.getElementById('tab-btn-config'); const btnCatalog = document.getElementById('tab-btn-catalog');
+            const activeClass = "admin-tab active px-4 py-4 text-sm sm:text-base font-bold whitespace-nowrap flex items-center justify-center gap-2";
+            const inactiveClass = "admin-tab px-4 py-4 text-sm sm:text-base font-bold whitespace-nowrap flex items-center justify-center gap-2 text-gray-400";
+
+            if(tab === 'config') {
+                if(btnConfig) btnConfig.className = activeClass; if(btnCatalog) btnCatalog.className = inactiveClass;
+                window.safeClassToggle('tab-content-config', 'flex', 'hidden');
+                window.safeClassToggle('tab-content-catalog', 'hidden', 'flex');
+            } else {
+                if(btnCatalog) btnCatalog.className = activeClass; if(btnConfig) btnConfig.className = inactiveClass;
+                window.safeClassToggle('tab-content-catalog', 'flex', 'hidden');
+                window.safeClassToggle('tab-content-config', 'hidden', 'flex');
+            }
+            const adminContainer = document.getElementById('admin-scroll-area');
+            if(adminContainer) adminContainer.scrollTop = 0;
+        };
+
         window.loginAdmin = async (e) => {
             e.preventDefault(); 
-            showLoader();
+            window.showLoader("Autenticando...");
             const errorMsg = document.getElementById('login-error-msg');
-            errorMsg.classList.add('hidden');
+            if(errorMsg) errorMsg.classList.add('hidden');
             
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
                 document.getElementById('login-email').value = ''; document.getElementById('login-pass').value = '';
+                window.hideLoader();
+                window.switchView('admin'); 
             } catch (error) { 
-                errorMsg.textContent = "Acesso Negado. Verifique seus dados.";
-                errorMsg.classList.remove('hidden');
-                hideLoader(); 
+                console.error(error);
+                if(errorMsg) { errorMsg.textContent = "Acesso Negado. Verifique o e-mail e senha."; errorMsg.classList.remove('hidden'); }
+                window.hideLoader(); 
             }
         };
 
-        window.logoutAdmin = async () => {
-            showLoader(); await signOut(auth);
-            window.location.hash = 'admin'; showLoginView(); hideLoader();
-        };
-
-        function loadDataFromFirebase() {
-            const docRef = doc(db, 'settings', 'linkNaBio');
-            onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    if(!data.catalog) data.catalog = [];
-                    if(!data.categories) data.categories = [];
-                    if(!data.vacationMode) data.vacationMode = { active: false, returnDate: "" };
-                    
-                    if(!data.businessHours) {
-                        data.businessHours = appData.businessHours; 
-                    }
-                    appData = data;
+        window.logoutAdmin = () => {
+            window.showModal({
+                title: 'Sair do Painel', message: 'Tem certeza que deseja sair?', type: 'info', confirmText: 'Sim, sair', cancelText: 'Cancelar',
+                onConfirm: async () => {
+                    window.showLoader("Saindo..."); await signOut(auth);
+                    window.switchView('login'); window.hideLoader();
                 }
-                
-                renderPublicView();
-                renderAdminView();
-                
-                if(window.location.hash === '#admin') {
-                    if(!currentUser) showLoginView(); else showAdminView();
-                } else {
-                    showPublicView();
-                }
-            }, (error) => console.error(error));
-        }
-
-        window.switchView = (viewName) => {
-            showLoader();
-            setTimeout(() => {
-                if (viewName === 'admin') {
-                    if (currentUser) { showAdminView(); window.location.hash = 'admin'; } 
-                    else { showLoginView(); window.location.hash = 'admin'; }
-                } else if (viewName === 'login') {
-                    if (currentUser) { showAdminView(); window.location.hash = 'admin'; }
-                    else { showLoginView(); window.location.hash = 'admin'; }
-                } else {
-                    showPublicView(); window.location.hash = '';
-                }
-                hideLoader();
-            }, 300);
-        };
-
-        window.switchAdminTab = (tab) => {
-            syncInputsToData(); 
-            
-            const btnConfig = document.getElementById('tab-btn-config');
-            const btnCatalog = document.getElementById('tab-btn-catalog');
-            const contentConfig = document.getElementById('tab-content-config');
-            const contentCatalog = document.getElementById('tab-content-catalog');
-
-            const activeBtnClass = "flex-1 py-4 text-sm sm:text-base font-bold border-b-2 border-hinode-roxo text-hinode-roxo transition-colors flex items-center justify-center gap-2";
-            const inactiveBtnClass = "flex-1 py-4 text-sm sm:text-base font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-colors flex items-center justify-center gap-2";
-
-            if(tab === 'config') {
-                btnConfig.className = activeBtnClass;
-                btnCatalog.className = inactiveBtnClass;
-                contentConfig.classList.remove('hidden'); contentConfig.classList.add('flex');
-                contentCatalog.classList.add('hidden'); contentCatalog.classList.remove('flex');
-            } else {
-                btnCatalog.className = activeBtnClass;
-                btnConfig.className = inactiveBtnClass;
-                contentCatalog.classList.remove('hidden'); contentCatalog.classList.add('flex');
-                contentConfig.classList.add('hidden'); contentConfig.classList.remove('flex');
-            }
-            
-            const adminContainer = document.querySelector('#view-admin > .overflow-y-auto');
-            if(adminContainer) adminContainer.scrollTop = 0;
-        };
-
-        window.filterCatalog = () => {
-            const query = document.getElementById('catalog-search').value.toLowerCase();
-            const list = document.getElementById('adm-catalog-list');
-            const items = list.children;
-            
-            appData.catalog.forEach((item, index) => {
-                const domItem = items[index];
-                if (!domItem) return;
-                
-                const searchableText = `${item.title} ${item.subtitle} ${item.details} ${item.tag}`.toLowerCase();
-                if (searchableText.includes(query)) domItem.style.display = 'block';
-                else domItem.style.display = 'none';
             });
         };
 
-        function showPublicView() {
-            document.getElementById('view-admin').classList.add('hidden'); document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-public').classList.remove('hidden'); window.scrollTo(0, 0);
-        }
-        function showLoginView() {
-            document.getElementById('view-public').classList.add('hidden'); document.getElementById('view-admin').classList.add('hidden');
-            document.getElementById('view-login').classList.remove('hidden'); document.getElementById('view-login').classList.add('flex'); window.scrollTo(0, 0);
-        }
-        function showAdminView() {
-            document.getElementById('view-public').classList.add('hidden'); document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-login').classList.remove('flex'); document.getElementById('view-admin').classList.remove('hidden'); 
-            document.getElementById('view-admin').classList.add('flex'); 
-            const adminContainer = document.querySelector('#view-admin > .overflow-y-auto');
-            if(adminContainer) adminContainer.scrollTop = 0;
-        }
-
+        // --- PUBLIC VIEWS (LINK NA BIO E MODAIS) ---
         function formatDateBR(dateString) {
-            if (!dateString) return '';
-            const parts = dateString.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            if (!dateString) return ''; const parts = dateString.split('-'); return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
         window.openLeadModal = (context, data = '') => {
-            currentLeadContext = context;
-            currentLeadData = data;
-            
-            document.getElementById('lead-name').value = '';
-            document.getElementById('lead-location').value = '';
-            document.getElementById('lead-subject').value = '';
-            document.getElementById('lead-error').classList.add('hidden');
+            currentLeadContext = context; currentLeadData = data;
+            document.getElementById('lead-name').value = ''; document.getElementById('lead-location').value = ''; document.getElementById('lead-subject').value = ''; window.safeClassToggle('lead-error', 'hidden', '');
+            const subjectContainer = document.getElementById('lead-subject-container'); const desc = document.getElementById('lead-modal-desc');
 
-            const subjectContainer = document.getElementById('lead-subject-container');
-            const desc = document.getElementById('lead-modal-desc');
-
-            if (context === 'main_wpp') {
-                subjectContainer.classList.remove('hidden');
-                desc.textContent = "Como podemos ajudar você hoje?";
-            } else if (context === 'category') {
-                subjectContainer.classList.add('hidden');
-                desc.textContent = `Ótima escolha! Para ver opções de ${data}, informe seus dados.`;
-            } else if (context === 'catalog') {
-                subjectContainer.classList.add('hidden');
-                desc.textContent = `Informe seus dados para ver disponibilidade e valores de ${data}.`;
-            }
+            if (context === 'main_wpp') { window.safeClassToggle('lead-subject-container', '', 'hidden'); desc.textContent = "Como podemos ajudar você hoje?"; } 
+            else if (context === 'category') { window.safeClassToggle('lead-subject-container', 'hidden', ''); desc.textContent = `Para ver opções de ${data}, informe seus dados.`; } 
+            else if (context === 'catalog') { window.safeClassToggle('lead-subject-container', 'hidden', ''); desc.textContent = `Informe seus dados para pedir ${data}.`; }
 
             const statusEl = document.getElementById('lead-time-status');
             
             if (appData.vacationMode && appData.vacationMode.active) {
                 const returnDateStr = appData.vacationMode.returnDate ? `Voltamos em ${formatDateBR(appData.vacationMode.returnDate)}.` : "Voltaremos em breve.";
                 statusEl.className = "mb-4 text-xs font-medium p-3 rounded-xl flex items-start gap-2 bg-red-50 text-red-700 border border-red-200";
-                statusEl.innerHTML = `<i class="ph-fill ph-airplane-tilt text-lg mt-0.5"></i> <div><strong>Vendedor Ausente/Férias</strong><br>Pode deixar sua mensagem, mas a resposta não será imediata. ${returnDateStr}</div>`;
+                statusEl.innerHTML = `<i class="ph-fill ph-airplane-tilt text-lg mt-0.5"></i> <div><strong>Ausente/Férias</strong><br>Sua resposta não será imediata. ${returnDateStr}</div>`;
             } else {
-                const now = new Date();
-                const currentDay = now.getDay(); 
-                const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes();
-                const todaySchedule = appData.businessHours[currentDay];
-                let isOpen = false;
+                const now = new Date(); const currentDay = now.getDay(); const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes();
+                const todaySchedule = appData.businessHours[currentDay]; let isOpen = false;
 
                 if (todaySchedule && todaySchedule.active) {
-                    const startParts = (todaySchedule.start || "08:00").split(':');
-                    const endParts = (todaySchedule.end || "18:00").split(':');
-                    const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
-                    const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
-
+                    const startParts = (todaySchedule.start || "08:00").split(':'); const endParts = (todaySchedule.end || "18:00").split(':');
+                    const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]); const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
                     if (startMinutes <= endMinutes) isOpen = currentMinutesOfDay >= startMinutes && currentMinutesOfDay <= endMinutes;
                     else isOpen = currentMinutesOfDay >= startMinutes || currentMinutesOfDay <= endMinutes;
                 }
 
                 if (isOpen) {
                     statusEl.className = "mb-4 text-xs font-medium p-3 rounded-xl flex items-start gap-2 bg-emerald-50 text-emerald-700 border border-emerald-100";
-                    statusEl.innerHTML = `<i class="ph-fill ph-clock text-lg mt-0.5"></i> <div><strong>Atendimento Online</strong><br>${appData.businessHours.obs || "Estamos online para te atender!"}</div>`;
+                    statusEl.innerHTML = `<i class="ph-fill ph-clock text-lg mt-0.5"></i> <div><strong>Atendimento Online</strong><br>${appData.businessHours.obs || "Estamos online!"}</div>`;
                 } else {
                     statusEl.className = "mb-4 text-xs font-medium p-3 rounded-xl flex items-start gap-2 bg-amber-50 text-amber-700 border border-amber-100";
-                    statusEl.innerHTML = `<i class="ph-fill ph-warning-circle text-lg mt-0.5"></i> <div><strong>Fora do horário comercial</strong><br>Não estamos online no momento e a resposta pode demorar um pouco. Deixe sua mensagem!</div>`;
+                    statusEl.innerHTML = `<i class="ph-fill ph-warning-circle text-lg mt-0.5"></i> <div><strong>Fora do horário comercial</strong><br>A resposta pode demorar um pouco. Deixe sua mensagem!</div>`;
                 }
             }
-
-            const modal = document.getElementById('lead-modal');
-            modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden';
+            window.safeClassToggle('lead-modal', 'flex', 'hidden'); document.body.style.overflow = 'hidden';
         };
 
-        window.closeLeadModal = () => {
-            const modal = document.getElementById('lead-modal');
-            modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = 'auto';
-        };
+        window.closeLeadModal = () => { window.safeClassToggle('lead-modal', 'hidden', 'flex'); document.body.style.overflow = 'auto'; };
 
         window.submitLeadModal = () => {
-            const name = document.getElementById('lead-name').value.trim();
-            const location = document.getElementById('lead-location').value.trim();
-            const subject = document.getElementById('lead-subject').value.trim();
-            const errorLabel = document.getElementById('lead-error');
-
-            if (!name || !location) {
-                errorLabel.textContent = "Por favor, preencha seu nome e localidade.";
-                errorLabel.classList.remove('hidden'); return;
-            }
-
-            if (currentLeadContext === 'main_wpp' && !subject) {
-                errorLabel.textContent = "Por favor, informe o que deseja.";
-                errorLabel.classList.remove('hidden'); return;
-            }
+            const name = document.getElementById('lead-name').value.trim(); const location = document.getElementById('lead-location').value.trim(); const subject = document.getElementById('lead-subject').value.trim(); const errorLabel = document.getElementById('lead-error');
+            if (!name || !location) { errorLabel.textContent = "Por favor, preencha nome e localidade."; errorLabel.classList.remove('hidden'); return; }
+            if (currentLeadContext === 'main_wpp' && !subject) { errorLabel.textContent = "Por favor, informe o que deseja."; errorLabel.classList.remove('hidden'); return; }
             errorLabel.classList.add('hidden');
 
             let message = `Olá ${appData.name}! Meu nome é *${name}*, falo de *${location}*.\n\n`;
-
             if (currentLeadContext === 'main_wpp') { message += `*Gostaria de falar sobre:* ${subject}`; } 
-            else if (currentLeadContext === 'category') { message += `Gostaria de ver opções e valores de *${currentLeadData}*.`; } 
-            else if (currentLeadContext === 'catalog') { message += `Gostaria de saber mais detalhes e condições de compra para o produto: *${currentLeadData}*.`; }
+            else if (currentLeadContext === 'category') { message += `Gostaria de ver opções de *${currentLeadData}*.`; } 
+            else if (currentLeadContext === 'catalog') { message += `Gostaria de saber mais detalhes e condições de compra para: *${currentLeadData}*.`; }
 
-            const waLink = `https://wa.me/55${appData.whatsapp}?text=${encodeURIComponent(message)}`;
-            window.open(waLink, '_blank');
-            closeLeadModal();
+            let wppNumber = appData.whatsapp.replace(/\D/g, ''); if(wppNumber.length >= 10 && !wppNumber.startsWith('55')) wppNumber = '55' + wppNumber;
+            window.open(`https://wa.me/${wppNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            window.closeLeadModal();
         };
 
-        window.openProductModal = (index) => {
-            const item = appData.catalog[index];
-            if(!item) return;
-
-            document.getElementById('modal-product-title').textContent = item.title;
-            const imgContainer = document.getElementById('modal-product-img-container');
-            imgContainer.innerHTML = '';
+        window.openPublicProductModal = (id) => {
+            const item = allProducts.find(p => p.id === id); if(!item) return;
+            document.getElementById('modal-product-title').textContent = item.name;
+            document.getElementById('modal-product-img').src = item.image || "https://placehold.co/400x300?text=Sem+Imagem";
             
-            if (item.images && item.images.length > 0) {
-                item.images.forEach(img => { 
-                    imgContainer.innerHTML += `<img src="${img}" class="w-full h-full flex-shrink-0 snap-center snap-always object-contain p-2" onerror="this.src='https://placehold.co/400x300?text=Sem+Imagem'">`; 
-                });
-                const indicator = document.getElementById('modal-swipe-indicator');
-                if (item.images.length > 1) indicator.classList.remove('hidden'); else indicator.classList.add('hidden');
-            } else {
-                imgContainer.innerHTML = `<img src="https://placehold.co/400x300?text=Sem+Imagem" class="w-full h-full flex-shrink-0 snap-center snap-always object-contain p-2">`;
-                document.getElementById('modal-swipe-indicator').classList.add('hidden');
-            }
-
-            const detailsText = item.details || "Nenhum detalhe informado para este produto.";
-            document.getElementById('modal-product-details').innerHTML = detailsText.replace(/\n/g, '<br>');
-
+            // Removemos as quebras de linha em excesso e mostramos de forma harmoniosa
+            const cleanNotes = item.notes ? item.notes.trim() : 'Sem descrição cadastrada.';
+            
+            document.getElementById('modal-product-details').innerHTML = `
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Família Olfativa</span>
+                        <span class="text-hinode-roxo font-bold text-base">${item.family || 'Não informada'}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-700 text-sm leading-relaxed block">${cleanNotes.replace(/\n/g, '<br>')}</span>
+                    </div>
+                </div>
+            `;
+            
             const btnWpp = document.getElementById('modal-btn-wpp');
-            btnWpp.href = "#";
-            btnWpp.onclick = (e) => {
-                e.preventDefault();
-                closeProductModal(); 
-                openLeadModal('catalog', item.title); 
-            };
-
-            const modalEl = document.getElementById('product-modal');
-            modalEl.classList.remove('hidden'); modalEl.classList.add('flex');
-            modalEl.scrollTop = 0; document.body.style.overflow = 'hidden'; 
+            btnWpp.href = "#"; btnWpp.onclick = (e) => { e.preventDefault(); window.closePublicProductModal(); window.openLeadModal('catalog', item.name); };
+            window.safeClassToggle('product-modal', 'flex', 'hidden');
+            document.getElementById('product-modal').scrollTop = 0; document.body.style.overflow = 'hidden'; 
         };
 
-        window.closeProductModal = () => {
-            document.getElementById('product-modal').classList.add('hidden'); document.getElementById('product-modal').classList.remove('flex'); document.body.style.overflow = 'auto';
-        };
+        window.closePublicProductModal = () => { window.safeClassToggle('product-modal', 'hidden', 'flex'); document.body.style.overflow = 'auto'; };
 
         function renderPublicView() {
             document.getElementById('pub-name').textContent = appData.name || '';
@@ -734,7 +779,6 @@
             document.getElementById('pub-logo').src = appData.logoUrl || '';
             
             const btnWpp = document.getElementById('pub-btn-whatsapp');
-            
             if (appData.vacationMode && appData.vacationMode.active) {
                 btnWpp.className = "bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-105 cursor-pointer";
                 btnWpp.innerHTML = `<i class="ph-fill ph-airplane-tilt text-xl"></i> Ausente / Férias`;
@@ -742,17 +786,15 @@
                 btnWpp.className = "bg-hinode-roxo hover:bg-hinode-roxoLight text-white font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-105 cursor-pointer";
                 btnWpp.innerHTML = `<i class="ph-fill ph-whatsapp-logo text-xl text-[#25D366]"></i> Fale comigo`;
             }
-
-            btnWpp.onclick = (e) => { e.preventDefault(); openLeadModal('main_wpp'); };
+            btnWpp.onclick = (e) => { e.preventDefault(); window.openLeadModal('main_wpp'); };
             document.getElementById('pub-btn-insta').href = `https://instagram.com/${appData.instagram}`;
 
             const offersContainer = document.getElementById('pub-offers-container');
             const offersSection = document.getElementById('pub-offers-section');
             offersContainer.innerHTML = '';
             
-            const activeOffers = appData.catalog
-                .map((item, index) => ({ ...item, originalIndex: index })) 
-                .filter(item => item.active === true);
+            // Pega apenas os marcados para o Link na Bio
+            const activeOffers = allProducts.filter(item => item.isActiveLink === true);
             
             if (activeOffers.length === 0) {
                 offersSection.style.display = 'none';
@@ -760,24 +802,30 @@
                 offersSection.style.display = 'block';
 
                 activeOffers.forEach((item) => {
-                    let imagesHtml = '';
-                    if(item.images && item.images.length > 0) {
-                        item.images.forEach(img => { 
-                            imagesHtml += `<img src="${img}" class="w-full h-full flex-shrink-0 snap-center snap-always object-contain p-2" onerror="this.src='https://placehold.co/400x300?text=Sem+Imagem'">`; 
-                        });
-                    } else { imagesHtml = `<img src="https://placehold.co/400x300?text=Sem+Imagem" class="w-full h-full flex-shrink-0 snap-center snap-always object-contain p-2">`; }
+                    let imgHtml = item.image ? `<img src="${item.image}" class="w-full h-full object-contain">` : `<img src="https://placehold.co/400x300?text=Sem+Imagem" class="w-full h-full object-contain">`;
+                    const tag = item.linkTag || 'OFERTA';
 
-                    const showSwipe = (item.images && item.images.length > 1) ? `<div class="absolute bottom-2 right-2 bg-hinode-roxo/50 backdrop-blur-sm text-white font-bold tracking-widest text-[9px] px-2 py-0.5 rounded-full pointer-events-none uppercase">Arraste ➔</div>` : '';
+                    // Limpa quebras de linha para o card não esticar
+                    const cleanNotesCard = item.notes ? item.notes.replace(/\n/g, ' ').trim() : 'Sem descrição cadastrada.';
 
                     const offerHTML = `
-                        <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col w-[85vw] sm:w-[320px] flex-shrink-0 snap-center">
-                            <div class="mb-2"><span class="bg-hinode-amarelo text-hinode-roxo text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider inline-block">${item.tag || 'DESTAQUE'}</span></div>
-                            <h4 class="font-bold text-lg text-hinode-roxo font-heading leading-tight line-clamp-2">${item.title}</h4>
-                            <p class="text-xs text-gray-500 mt-1 mb-4 line-clamp-1 font-medium">${item.subtitle}</p>
-                            <div class="w-full h-48 flex overflow-x-auto snap-x snap-mandatory hide-scroll bg-purple-50 rounded-2xl relative border border-purple-100 mb-2 mt-auto">
-                                ${imagesHtml} ${showSwipe}
+                        <div class="bg-white rounded-3xl p-4 shadow-md border border-gray-100 flex flex-col min-w-[280px] w-[80vw] sm:w-[320px] flex-shrink-0 snap-center snap-always">
+                            <div class="mb-3 flex justify-between items-start">
+                                <span class="bg-hinode-amarelo text-hinode-roxo text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider inline-block">${tag}</span>
                             </div>
-                            <button onclick="openProductModal(${item.originalIndex})" class="w-full mt-4 block text-center bg-gray-100 hover:bg-purple-100 text-hinode-roxo font-bold py-3 rounded-xl transition-colors text-sm">
+                            
+                            <h4 class="font-bold text-lg text-hinode-roxo font-heading leading-tight line-clamp-2">${item.name}</h4>
+                            <p class="text-[10px] text-gray-400 mt-1 mb-2 font-bold uppercase tracking-wider">${item.family}</p>
+                            
+                            <p class="text-xs text-gray-500 mb-3 line-clamp-3 font-medium leading-relaxed">
+                                ${cleanNotesCard}
+                            </p>
+                            
+                            <div class="w-full h-40 mt-auto flex items-center justify-center bg-purple-50 rounded-2xl relative border border-purple-100 mb-3 p-2">
+                                ${imgHtml}
+                            </div>
+                            
+                            <button onclick="window.openPublicProductModal('${item.id}')" class="w-full block text-center bg-gray-100 hover:bg-purple-100 text-hinode-roxo font-bold py-3 rounded-xl transition-colors text-sm">
                                 Ver Detalhes
                             </button>
                         </div>
@@ -795,13 +843,12 @@
                 const hoverBg = isCyan ? 'group-hover:bg-hinode-amarelo' : 'group-hover:bg-hinode-roxoLight';
                 const borderHover = isCyan ? 'hover:border-hinode-amarelo' : 'hover:border-hinode-roxoLight';
 
-                // Migração automática de ícones legados para o utilizador
                 let iconName = cat.icon;
                 if(iconName === 'perfume' || iconName === 'flask') iconName = 'gender-female'; 
                 if(iconName === 'sparkle') iconName = 'sparkles'; 
 
                 const catHTML = `
-                    <button onclick="openLeadModal('category', '${cat.title}')" class="w-full bg-white border-2 border-gray-100 p-4 rounded-2xl shadow-sm ${borderHover} transition-all flex items-center gap-4 group text-left">
+                    <button onclick="window.openLeadModal('category', '${cat.title}')" class="w-full bg-white border-2 border-gray-100 p-4 rounded-2xl shadow-sm ${borderHover} transition-all flex items-center gap-4 group text-left">
                         <div class="w-14 h-14 ${bgClass} rounded-xl flex items-center justify-center ${textClass} ${hoverBg} group-hover:text-white transition-colors flex-shrink-0">
                             <i class="ph-fill ph-${iconName} text-3xl"></i>
                         </div>
@@ -816,28 +863,30 @@
             });
         }
 
+        // --- SISTEMA ADMIN ---
+        window.filterCatalog = () => {
+            const query = document.getElementById('catalog-search').value.toLowerCase();
+            const list = document.getElementById('adm-catalog-list');
+            const items = list.children;
+            allProducts.forEach((item, index) => {
+                const domItem = items[index]; if (!domItem) return;
+                const searchableText = `${item.name} ${item.family} ${item.notes}`.toLowerCase();
+                if (searchableText.includes(query)) domItem.style.display = 'flex'; else domItem.style.display = 'none';
+            });
+        };
+
         window.toggleVacationMode = () => {
             const isActive = document.getElementById('adm-vacation-mode').checked;
             const settingsDiv = document.getElementById('adm-vacation-settings');
             const normalDiv = document.getElementById('adm-normal-schedule');
-            
-            if (isActive) {
-                settingsDiv.classList.remove('hidden');
-                normalDiv.classList.add('opacity-40', 'pointer-events-none');
-            } else {
-                settingsDiv.classList.add('hidden');
-                normalDiv.classList.remove('opacity-40', 'pointer-events-none');
-            }
+            if (isActive) { window.safeClassToggle('adm-vacation-settings', '', 'hidden'); window.safeClassToggle('adm-normal-schedule', 'opacity-40 pointer-events-none', ''); } 
+            else { window.safeClassToggle('adm-vacation-settings', 'hidden', ''); window.safeClassToggle('adm-normal-schedule', '', 'opacity-40 pointer-events-none'); }
         };
 
         window.toggleDayTimes = (dayIndex) => {
             const isActive = document.getElementById(`adm-day-active-${dayIndex}`).checked;
             document.getElementById(`adm-day-start-${dayIndex}`).disabled = !isActive;
             document.getElementById(`adm-day-end-${dayIndex}`).disabled = !isActive;
-        };
-
-        window.toggleCatalogActive = (index) => {
-            appData.catalog[index].active = document.getElementById(`catalog-active-${index}`).checked;
         };
 
         function renderAdminView() {
@@ -855,17 +904,16 @@
                 window.toggleVacationMode(); 
             }
 
-            const daysOfWeek = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
             const scheduleContainer = document.getElementById('adm-schedule-container');
             scheduleContainer.innerHTML = '';
-            
             for(let i=0; i<7; i++) {
                 const dayData = appData.businessHours[i];
                 scheduleContainer.innerHTML += `
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-white border border-gray-200 rounded-xl gap-2">
-                        <label class="flex items-center gap-3 w-full sm:w-32 cursor-pointer mb-2 sm:mb-0">
-                            <input type="checkbox" id="adm-day-active-${i}" ${dayData.active ? 'checked' : ''} onchange="toggleDayTimes(${i})" class="w-5 h-5 text-hinode-roxo rounded border-gray-300 focus:ring-hinode-roxo shrink-0">
-                            <span class="text-xs font-bold text-gray-700 truncate">${daysOfWeek[i]}</span>
+                    <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl">
+                        <label class="flex items-center gap-3 w-32 cursor-pointer">
+                            <input type="checkbox" id="adm-day-active-${i}" ${dayData.active ? 'checked' : ''} onchange="window.toggleDayTimes(${i})" class="w-5 h-5 text-hinode-roxo rounded border-gray-300 focus:ring-hinode-roxo">
+                            <span class="text-xs font-bold text-gray-700">${daysOfWeek[i]}</span>
                         </label>
                         <div class="flex items-center gap-2">
                             <input type="time" id="adm-day-start-${i}" value="${dayData.start}" class="border border-gray-200 p-2 rounded-lg text-xs font-bold outline-none focus:border-hinode-roxo disabled:opacity-40 disabled:bg-gray-100 w-[80px]" ${dayData.active ? '' : 'disabled'}>
@@ -875,120 +923,113 @@
                     </div>
                 `;
             }
-
             document.getElementById('adm-time-obs').value = appData.businessHours.obs || '';
-
-            renderAdminCatalog();
             renderAdminCategories();
         }
 
+        // CATÁLOGO ADMIN INTEGRADO
         function renderAdminCatalog() {
-            const list = document.getElementById('adm-catalog-list');
-            list.innerHTML = '';
-            document.getElementById('catalog-count-badge').textContent = appData.catalog.length;
+            const list = document.getElementById('adm-catalog-list'); list.innerHTML = '';
+            document.getElementById('catalog-count-badge').textContent = allProducts.length;
             
-            appData.catalog.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = `p-5 rounded-2xl relative group shadow-sm border ${item.active ? 'bg-white border-green-200' : 'bg-gray-50 border-gray-200 opacity-70'}`;
+            let sortedProducts = [...allProducts].sort((a, b) => a.name.localeCompare(b.name));
+            sortedProducts.forEach(p => {
+                const isLink = p.isActiveLink === true; 
+
+                const li = document.createElement('li');
+                li.className = `p-4 flex justify-between items-center hover:bg-gray-50 transition border border-gray-100 rounded-2xl shadow-sm bg-white ${!isLink ? 'opacity-60' : ''}`;
                 
-                const upBtn = index > 0 ? `<button onclick="moveItem('catalog', ${index}, -1)" class="p-2 bg-white text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors shadow-sm"><i class="ph-bold ph-caret-up text-lg"></i></button>` : `<div class="w-[38px]"></div>`;
-                const downBtn = index < appData.catalog.length - 1 ? `<button onclick="moveItem('catalog', ${index}, 1)" class="p-2 bg-white text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors shadow-sm"><i class="ph-bold ph-caret-down text-lg"></i></button>` : `<div class="w-[38px]"></div>`;
-                
-                let imagesInputsHtml = '';
-                if(item.images) {
-                    item.images.forEach((img, imgIndex) => {
-                        imagesInputsHtml += `
-                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-3 bg-white p-2 border border-gray-200 rounded-xl shadow-sm">
-                                <div class="flex w-full items-center gap-3">
-                                    <img src="${img}" class="w-12 h-12 object-contain rounded-lg bg-gray-50 border border-gray-100 shrink-0" onerror="this.src='https://placehold.co/48x48?text=IMG'">
-                                    <input type="text" id="catalog-${index}-img-${imgIndex}" value="${img}" class="p-2 text-xs w-full font-medium outline-none focus:text-hinode-roxo bg-transparent" placeholder="Link URL da imagem">
-                                    <button onclick="removeCatalogImage(${index}, ${imgIndex})" class="p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"><i class="ph-bold ph-x-circle text-xl"></i></button>
-                                </div>
+                let imgThumb = p.image ? `<img src="${p.image}" class="w-12 h-12 object-cover rounded-lg shadow-sm border border-gray-100 mr-4">` : `<div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center border border-gray-100 mr-4"><i class="ph-fill ph-drop text-hinode-roxo opacity-50 text-xl"></i></div>`;
+
+                let badges = isLink ? '<span class="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-md font-bold uppercase tracking-widest">Visível no Link</span>' : '<span class="text-[9px] bg-gray-200 text-gray-500 px-2 py-0.5 rounded-md font-bold uppercase tracking-widest">Oculto no Link</span>';
+
+                li.innerHTML = `
+                    <div class="flex items-center">
+                        ${imgThumb}
+                        <div>
+                            <p class="font-bold text-base font-heading ${isLink ? 'text-hinode-roxo' : 'text-gray-500'}">${p.name}</p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <p class="text-xs text-gray-500 font-semibold mr-1">${p.family}</p>
+                                ${badges}
                             </div>
-                        `;
-                    });
-                }
-
-                div.innerHTML = `
-                    <div class="absolute top-4 right-4 flex gap-1.5">
-                        ${upBtn}${downBtn}
-                        <button onclick="openDeleteModal('catalog', ${index})" class="p-2 bg-white text-red-500 border border-red-200 rounded-lg hover:bg-red-50 ml-3 shadow-sm transition-colors"><i class="ph-bold ph-trash text-lg"></i></button>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mb-5 pr-32">
-                        <div class="font-extrabold text-[10px] text-hinode-roxo uppercase tracking-widest bg-purple-100 px-3 py-1.5 rounded-md">Produto #${index + 1}</div>
-                        <label class="relative inline-flex items-center cursor-pointer ml-3">
-                            <input type="checkbox" id="catalog-active-${index}" ${item.active ? 'checked' : ''} onchange="toggleCatalogActive(${index})" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#25D366]"></div>
-                            <span class="ml-2 text-[10px] font-bold ${item.active ? 'text-[#25D366]' : 'text-gray-400'} uppercase tracking-wider">Visível</span>
-                        </label>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div class="col-span-1 sm:col-span-2">
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Nome do Produto</label>
-                            <input type="text" id="catalog-title-${index}" value="${item.title}" class="border-2 border-gray-100 p-3 rounded-xl text-sm font-bold w-full bg-white outline-none focus:border-hinode-roxo transition-colors">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Subtítulo (Breve desc.)</label>
-                            <input type="text" id="catalog-sub-${index}" value="${item.subtitle}" class="border-2 border-gray-100 p-3 rounded-xl text-sm font-medium w-full bg-white outline-none focus:border-hinode-roxo transition-colors">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Etiqueta de Destaque</label>
-                            <input type="text" id="catalog-tag-${index}" value="${item.tag || 'OFERTA'}" class="border-2 border-gray-100 p-3 rounded-xl text-sm font-bold text-hinode-amarelo w-full bg-white outline-none focus:border-hinode-roxo transition-colors">
                         </div>
                     </div>
-                    
-                    <div class="mb-5 bg-purple-50/50 p-4 rounded-2xl border border-dashed border-purple-200">
-                        <label class="text-xs font-bold text-hinode-roxo uppercase tracking-wider mb-3 flex items-center gap-1.5"><i class="ph-bold ph-images text-lg"></i> Imagens do Produto</label>
-                        <div id="catalog-${index}-images-list" class="max-h-48 overflow-y-auto pr-2 hide-scroll">
-                            ${imagesInputsHtml}
-                            ${(!item.images || item.images.length === 0) ? '<p class="text-[11px] text-gray-500 mb-3 font-medium bg-white p-3 rounded-xl border text-center">Nenhuma imagem adicionada.</p>' : ''}
-                        </div>
-                        <div class="flex flex-col sm:flex-row gap-3 mt-3">
-                            <button onclick="addCatalogImageLink(${index})" class="w-full sm:w-auto text-[11px] font-bold bg-white border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 shadow-sm transition-colors text-gray-700 flex items-center justify-center gap-1"><i class="ph-bold ph-link text-sm"></i> Link Externo</button>
-                            <label class="w-full sm:w-auto text-[11px] font-bold bg-hinode-roxo text-white px-4 py-2.5 rounded-xl hover:bg-hinode-roxoLight cursor-pointer text-center shadow-sm transition-colors flex items-center justify-center gap-1">
-                                <i class="ph-bold ph-upload-simple text-sm"></i> Subir Foto
-                                <input type="file" accept="image/*" class="hidden" onchange="handleCatalogImageUpload(event, ${index})">
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Detalhes / Ficha Técnica</label>
-                        <textarea id="catalog-details-${index}" rows="4" class="border-2 border-gray-100 p-3 rounded-xl text-sm font-medium w-full bg-white outline-none focus:border-hinode-roxo transition-colors" placeholder="Escreva os detalhes aqui...">${item.details || ''}</textarea>
+                    <div class="flex gap-2">
+                        <button onclick="window.editProduct('${p.id}')" class="text-hinode-roxo hover:text-hinode-amarelo p-2.5 bg-purple-50 hover:bg-yellow-50 rounded-lg transition shadow-sm font-bold text-xs flex items-center gap-1"><i class="ph-bold ph-pencil-simple text-lg"></i> Visibilidade</button>
+                        <button onclick="window.deleteProduct('${p.id}')" title="Excluir Definitivamente" class="text-red-400 hover:text-red-600 p-2.5 bg-red-50 rounded-lg transition shadow-sm"><i class="ph-bold ph-trash text-xl"></i></button>
                     </div>
                 `;
-                list.appendChild(div);
+                list.appendChild(li);
             });
-            if(appData.catalog.length === 0) list.innerHTML = '<div class="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-300"><i class="ph-fill ph-package text-5xl text-gray-300 mb-3"></i><p class="text-sm font-bold text-gray-400">O seu catálogo está vazio.</p></div>';
+            if(allProducts.length === 0) list.innerHTML = '<div class="text-center py-10"><i class="ph-fill ph-package text-5xl text-gray-300 mb-3"></i><p class="text-sm font-bold text-gray-400">Seu catálogo está vazio. Cadastre no Quiz.</p></div>';
         }
 
+        window.closeAdminProductForm = () => window.safeClassToggle('admin-product-modal', 'hidden', 'flex');
+
+        window.editProduct = (id) => {
+            const p = allProducts.find(x => x.id === id); if(!p) return;
+            document.getElementById('prod-id').value = p.id; 
+            document.getElementById('prod-name').value = p.name; 
+            document.getElementById('prod-family').value = p.family; 
+            document.getElementById('prod-notes').value = p.notes; 
+            
+            document.getElementById('prod-active-link').checked = p.isActiveLink === true;
+            document.getElementById('prod-link-tag').value = p.linkTag || 'OFERTA';
+            
+            window.safeClassToggle('admin-product-modal', 'flex', 'hidden');
+            const modalContent = document.querySelector('#admin-product-modal > div'); if (modalContent) modalContent.scrollTop = 0;
+        }
+
+        window.deleteProduct = (id) => {
+            window.showModal({
+                title: 'Excluir Fragrância', 
+                message: 'Tem certeza que quer apagar esse perfume DE TUDO? Ele vai sumir tanto do Quiz quanto daqui do Link.', 
+                type: 'error', 
+                confirmText: 'Sim, apagar', 
+                cancelText: 'Cancelar',
+                onConfirm: async () => { window.showLoader("Apagando..."); await deleteDoc(doc(db, "products", id)); window.hideLoader(); }
+            });
+        }
+
+        document.getElementById('btn-save-prod').addEventListener('click', async () => {
+            window.showLoader("Salvando...");
+            const id = document.getElementById('prod-id').value; 
+            if(!id) { window.hideLoader(); return; }
+            
+            const prodData = { 
+                isActiveLink: document.getElementById('prod-active-link').checked,
+                linkTag: document.getElementById('prod-link-tag').value.trim() || 'OFERTA'
+            };
+
+            try {
+                await updateDoc(doc(db, "products", id), prodData); 
+                window.closeAdminProductForm();
+                window.hideLoader();
+                
+                const toast = document.getElementById('toast'); toast.classList.remove('translate-x-full', 'opacity-0'); setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); }, 3000); 
+            } catch(e) {
+                console.error(e); window.hideLoader(); window.showModal({ title: 'Erro', message: 'Não foi possível salvar.', type: 'error' });
+            }
+        });
+
+        // RENDERIZAR CATEGORIAS (LINKS RÁPIDOS)
         function renderAdminCategories() {
-            const list = document.getElementById('adm-categories-list');
-            list.innerHTML = '';
+            const list = document.getElementById('adm-categories-list'); list.innerHTML = '';
             appData.categories.forEach((cat, index) => {
                 let iconOptions = '';
-                
-                // Tratar dados legados do BD para mostrar correto no admin
                 let currentIcon = cat.icon;
                 if(currentIcon === 'perfume' || currentIcon === 'flask') currentIcon = 'gender-female';
                 if(currentIcon === 'sparkle') currentIcon = 'sparkles';
 
-                availableIcons.forEach(ic => {
-                    const selected = currentIcon === ic.id ? 'selected' : '';
-                    iconOptions += `<option value="${ic.id}" ${selected}>${ic.name}</option>`;
-                });
-                
-                const div = document.createElement('div');
-                div.className = "bg-white border border-gray-200 p-4 rounded-2xl relative group shadow-sm flex flex-col gap-3";
-                const upBtn = index > 0 ? `<button onclick="moveItem('category', ${index}, -1)" class="p-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100"><i class="ph-bold ph-caret-up text-lg"></i></button>` : `<div class="w-9"></div>`;
-                const downBtn = index < appData.categories.length - 1 ? `<button onclick="moveItem('category', ${index}, 1)" class="p-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100"><i class="ph-bold ph-caret-down text-lg"></i></button>` : `<div class="w-9"></div>`;
+                availableIcons.forEach(ic => { const selected = currentIcon === ic.id ? 'selected' : ''; iconOptions += `<option value="${ic.id}" ${selected}>${ic.name}</option>`; });
+                const div = document.createElement('div'); div.className = "bg-white border border-gray-200 p-4 rounded-2xl relative group shadow-sm flex flex-col gap-3";
+                const upBtn = index > 0 ? `<button onclick="window.moveItem('category', ${index}, -1)" class="p-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100"><i class="ph-bold ph-caret-up text-lg"></i></button>` : `<div class="w-9"></div>`;
+                const downBtn = index < appData.categories.length - 1 ? `<button onclick="window.moveItem('category', ${index}, 1)" class="p-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100"><i class="ph-bold ph-caret-down text-lg"></i></button>` : `<div class="w-9"></div>`;
 
                 div.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-1.5 z-10">
                         ${upBtn}${downBtn}
-                        <button onclick="openDeleteModal('category', ${index})" class="p-1.5 bg-red-50 text-red-500 border border-red-100 rounded-lg ml-2 shadow-sm hover:bg-red-100"><i class="ph-bold ph-trash text-lg"></i></button>
+                        <button onclick="window.openDeleteModal('category', ${index})" class="p-1.5 bg-red-50 text-red-500 border border-red-100 rounded-lg ml-2 shadow-sm hover:bg-red-100"><i class="ph-bold ph-trash text-lg"></i></button>
                     </div>
                     <div class="grid grid-cols-1 pr-32">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Título do Botão</label>
@@ -998,7 +1039,7 @@
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Subtítulo (Opcional)</label>
                         <input type="text" id="cat-sub-${index}" value="${cat.subtitle}" placeholder="Breve descrição" class="border-2 border-gray-100 p-2.5 rounded-xl text-sm font-medium w-full bg-white outline-none focus:border-hinode-roxo transition-colors">
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Ícone</label>
                             <select id="cat-icon-${index}" class="border-2 border-gray-100 p-2.5 rounded-xl text-sm font-bold w-full bg-white outline-none focus:border-hinode-roxo transition-colors cursor-pointer">${iconOptions}</select>
@@ -1018,21 +1059,6 @@
         }
 
         function syncInputsToData() {
-            for(let i = 0; i < appData.catalog.length; i++) {
-                if(document.getElementById(`catalog-title-${i}`)) {
-                    appData.catalog[i].active = document.getElementById(`catalog-active-${i}`).checked;
-                    appData.catalog[i].title = document.getElementById(`catalog-title-${i}`).value;
-                    appData.catalog[i].subtitle = document.getElementById(`catalog-sub-${i}`).value;
-                    appData.catalog[i].tag = document.getElementById(`catalog-tag-${i}`).value;
-                    appData.catalog[i].details = document.getElementById(`catalog-details-${i}`).value;
-                    const newImages = [];
-                    for(let j = 0; j < appData.catalog[i].images.length; j++) {
-                        const imgInput = document.getElementById(`catalog-${i}-img-${j}`);
-                        if(imgInput && imgInput.value.trim() !== '') newImages.push(imgInput.value.trim());
-                    }
-                    appData.catalog[i].images = newImages;
-                }
-            }
             for(let i = 0; i < appData.categories.length; i++) {
                 if(document.getElementById(`cat-title-${i}`)) {
                     appData.categories[i].title = document.getElementById(`cat-title-${i}`).value;
@@ -1041,12 +1067,10 @@
                     appData.categories[i].color = document.getElementById(`cat-color-${i}`).value;
                 }
             }
-
             if(document.getElementById('adm-vacation-mode')) {
                 appData.vacationMode.active = document.getElementById('adm-vacation-mode').checked;
                 appData.vacationMode.returnDate = document.getElementById('adm-vacation-return').value;
             }
-
             for(let i=0; i<7; i++) {
                 if(document.getElementById(`adm-day-active-${i}`)) {
                     appData.businessHours[i].active = document.getElementById(`adm-day-active-${i}`).checked;
@@ -1057,69 +1081,40 @@
             appData.businessHours.obs = document.getElementById('adm-time-obs').value;
         }
 
-        window.addCatalogItem = () => { syncInputsToData(); appData.catalog.unshift({ active: true, title: "", subtitle: "", tag: "Oferta", images: [], details: "" }); renderAdminCatalog(); };
         window.addCategory = () => { syncInputsToData(); appData.categories.push({ title: "", subtitle: "", icon: "gender-female", color: "cyan" }); renderAdminCategories(); };
-        window.addCatalogImageLink = (index) => { syncInputsToData(); appData.catalog[index].images.push(''); renderAdminCatalog(); };
-        window.removeCatalogImage = (catIndex, imgIndex) => { syncInputsToData(); appData.catalog[catIndex].images.splice(imgIndex, 1); renderAdminCatalog(); };
         
         window.moveItem = (type, index, direction) => { 
             syncInputsToData(); 
-            const array = type === 'catalog' ? appData.catalog : appData.categories; 
+            const array = appData.categories; 
             if (direction === -1 && index > 0) { const temp = array[index]; array[index] = array[index - 1]; array[index - 1] = temp; } 
             else if (direction === 1 && index < array.length - 1) { const temp = array[index]; array[index] = array[index + 1]; array[index + 1] = temp; } 
-            if(type === 'catalog') renderAdminCatalog(); else renderAdminCategories(); 
+            renderAdminCategories(); 
         };
         
-        window.openDeleteModal = (type, index) => { syncInputsToData(); itemToDelete = { type, index }; document.getElementById('delete-modal').classList.remove('hidden'); document.getElementById('delete-modal').classList.add('flex'); };
-        window.closeDeleteModal = () => { itemToDelete = null; document.getElementById('delete-modal').classList.add('hidden'); document.getElementById('delete-modal').classList.remove('flex'); };
+        window.openDeleteModal = (type, index) => { syncInputsToData(); itemToDelete = { type, index }; window.safeClassToggle('delete-modal', 'flex', 'hidden'); };
+        window.closeDeleteModal = () => { itemToDelete = null; window.safeClassToggle('delete-modal', 'hidden', 'flex'); };
         window.executeDelete = () => { 
-            if (itemToDelete) { 
-                if (itemToDelete.type === 'catalog') appData.catalog.splice(itemToDelete.index, 1); 
-                else if (itemToDelete.type === 'category') appData.categories.splice(itemToDelete.index, 1); 
-                if(itemToDelete.type === 'catalog') renderAdminCatalog(); else renderAdminCategories(); 
-            } closeDeleteModal(); 
+            if (itemToDelete && itemToDelete.type === 'category') appData.categories.splice(itemToDelete.index, 1); 
+            renderAdminCategories(); window.closeDeleteModal(); 
         };
 
         window.handleImageUpload = (event, dataKey, previewId) => {
             const file = event.target.files[0]; if (!file) return;
-            processImageUpload(file, (base64) => { appData[dataKey] = base64; document.getElementById(previewId).src = base64; });
-        };
-
-        window.handleCatalogImageUpload = (event, catIndex) => {
-            const file = event.target.files[0]; if (!file) return;
-            processImageUpload(file, (base64) => { syncInputsToData(); appData.catalog[catIndex].images.push(base64); renderAdminCatalog(); });
-        };
-
-        function processImageUpload(file, callback) {
-            showLoader();
+            window.showLoader("Carregando imagem...");
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas'); 
-                    const MAX_SIZE = 600; 
-                    let width = img.width; let height = img.height;
-                    
-                    if (width > height) { 
-                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
-                    } else { 
-                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } 
-                    }
-                    
-                    canvas.width = width; canvas.height = height; 
-                    const ctx = canvas.getContext('2d'); 
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    callback(canvas.toDataURL('image/jpeg', 0.7)); 
-                    hideLoader();
-                }; 
-                img.src = e.target.result;
-            }; 
-            reader.readAsDataURL(file);
-        }
+                const img = new Image(); img.onload = () => {
+                    const canvas = document.createElement('canvas'); const MAX_SIZE = 600; let width = img.width; let height = img.height;
+                    if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
+                    canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    const b64 = canvas.toDataURL('image/jpeg', 0.7);
+                    appData[dataKey] = b64; document.getElementById(previewId).src = b64; window.hideLoader();
+                }; img.src = e.target.result;
+            }; reader.readAsDataURL(file);
+        };
 
         window.saveData = async () => {
-            showLoader();
+            window.showLoader("Salvando configurações...");
             appData.name = document.getElementById('adm-name').value;
             appData.role = document.getElementById('adm-role').value;
             appData.bio = document.getElementById('adm-bio').value;
@@ -1128,44 +1123,13 @@
             syncInputsToData();
 
             try {
-                const docRef = doc(db, 'settings', 'linkNaBio');
-                await setDoc(docRef, appData);
-                showToast("Salvo com sucesso!");
-                hideLoader();
+                await setDoc(doc(db, 'settings', 'linkNaBio'), appData);
+                window.hideLoader();
+                window.showModal({ title: 'Sucesso', message: 'Configurações salvas com sucesso!', type: 'success' });
             } catch (error) {
-                console.error(error);
-                if(error.code === 'resource-exhausted' || error.message.includes('payload') || error.message.includes('size')) {
-                    showToast("Erro: Limite de armazenamento excedido. Reduza as imagens.", true);
-                } else {
-                    showToast("Erro ao salvar. Verifique a sessão.", true);
-                }
-                hideLoader();
+                console.error(error); window.hideLoader(); window.showModal({ title: 'Erro', message: 'Erro ao salvar as configurações.', type: 'error' });
             }
         };
-
-        function showLoader() { document.getElementById('loader').style.display = 'flex'; setTimeout(() => document.getElementById('loader').style.opacity = '1', 10); }
-        function hideLoader() { document.getElementById('loader').style.opacity = '0'; setTimeout(() => document.getElementById('loader').style.display = 'none', 300); }
-        
-        function showToast(msg, isError = false) { 
-            const toast = document.getElementById('toast'); 
-            const toastMsg = document.getElementById('toast-msg'); 
-            const icon = toast.querySelector('i');
-            
-            toastMsg.textContent = msg; 
-            
-            if (isError) {
-                toast.classList.remove('bg-green-500');
-                toast.classList.add('bg-red-500');
-                icon.className = 'ph-fill ph-warning-circle text-xl';
-            } else {
-                toast.classList.remove('bg-red-500');
-                toast.classList.add('bg-green-500');
-                icon.className = 'ph-fill ph-check-circle text-xl';
-            }
-
-            toast.classList.remove('translate-x-full', 'opacity-0'); 
-            setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); }, 4000); 
-        }
 
         loadDataFromFirebase();
     </script>
