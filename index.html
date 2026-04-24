@@ -62,7 +62,7 @@
 <body class="text-gray-800 relative min-h-screen overflow-x-hidden w-full">
 
     <!-- LOADER -->
-    <div id="loader" class="fixed inset-0 bg-hinode-roxo/95 z-[9999] flex flex-col items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+    <div id="loader" class="fixed inset-0 bg-hinode-roxo/95 z-[9999] flex flex-col items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-100">
         <i class="ph ph-spinner-gap animate-spin text-6xl text-hinode-amarelo mb-4"></i>
         <p class="text-2xl font-bold text-white font-heading text-center" id="loader-text">Carregando...</p>
     </div>
@@ -97,7 +97,6 @@
 
             <div class="mb-8">
                 <h3 class="font-bold text-xl text-hinode-roxo font-heading mb-3 flex items-center gap-2"><i class="ph-fill ph-list-dashes text-hinode-amarelo"></i> Detalhes da Fragrância</h3>
-                <!-- Aqui entra o conteúdo harmonizado dinamicamente pelo JS -->
                 <div id="modal-product-details" class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                     Detalhes aqui...
                 </div>
@@ -160,20 +159,20 @@
             
             <div class="w-full flex justify-between items-end -mt-16 mb-5 px-6 relative z-20">
                 <div class="relative group">
-                    <img id="pub-photo" src="" alt="Perfil" class="w-[120px] h-[120px] object-cover rounded-full border-[4px] border-white shadow-xl bg-white">
+                    <img id="pub-photo" src="https://images.unsplash.com/photo-1595425970377-c9703bc48b4d?q=80&w=300&auto=format&fit=crop" alt="Perfil" class="w-[120px] h-[120px] object-cover rounded-full border-[4px] border-white shadow-xl bg-white">
                 </div>
                 <div class="relative group mb-2">
-                    <img id="pub-logo" src="" alt="Logo" class="w-[85px] h-[85px] object-contain border-[4px] border-white shadow-md bg-white rounded-2xl p-1">
+                    <img id="pub-logo" src="https://placehold.co/150x150/ffffff/4C1D95?text=AURA" alt="Logo" class="w-[85px] h-[85px] object-contain border-[4px] border-white shadow-md bg-white rounded-2xl p-1">
                 </div>
             </div>
 
             <div class="w-full text-left mb-6 px-6">
                 <h1 class="text-2xl font-extrabold text-hinode-roxo font-heading flex items-center gap-1.5 leading-tight">
-                    <span id="pub-name">Nome</span>
+                    <span id="pub-name">Aura Perfumes</span>
                     <i class="ph-fill ph-seal-check text-hinode-amarelo text-xl" title="Conta Verificada"></i>
                 </h1>
-                <h2 id="pub-role" class="text-[12px] font-bold text-gray-400 tracking-widest uppercase mt-1">Cargo</h2>
-                <p id="pub-bio" class="text-gray-600 text-[14px] mt-2 leading-relaxed">Biografia...</p>
+                <h2 id="pub-role" class="text-[12px] font-bold text-gray-400 tracking-widest uppercase mt-1">Especialista</h2>
+                <p id="pub-bio" class="text-gray-600 text-[14px] mt-2 leading-relaxed">Carregando informações...</p>
             </div>
 
             <div class="flex gap-3 w-full justify-start mb-8 px-6">
@@ -194,14 +193,32 @@
             </div>
 
             <div class="w-full mb-8 px-6">
-                <h3 class="text-xl font-bold text-hinode-roxo font-heading mb-4">Links Rápidos</h3>
-                <div id="pub-categories" class="flex flex-col gap-3"></div>
+                <h3 class="text-xl font-bold text-hinode-roxo font-heading mb-4">Descubra & Links</h3>
+                
+                <div class="flex flex-col gap-3">
+                    
+                    <!-- NOVO BOTÃO ESTÁTICO DO QUIZ OLFATIVO EM DESTAQUE (Tamanho Menor) -->
+                    <a href="https://auraperfumeshnd.github.io/mapaolfativo" target="_blank" class="w-full bg-gradient-to-r from-hinode-roxo to-hinode-roxoLight border-2 border-transparent p-3.5 rounded-2xl shadow-sm transition-transform hover:-translate-y-1 flex items-center gap-3 group text-left">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-hinode-amarelo transition-colors flex-shrink-0">
+                            <i class="ph-fill ph-magic-wand text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white text-base leading-tight mb-0.5">Teste do Perfume Ideal</h4>
+                            <p class="text-xs text-purple-200 font-medium">Faça o Quiz Olfativo Gratuito</p>
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-white opacity-80 group-hover:translate-x-1 transition-transform text-xl"></i>
+                    </a>
+
+                    <!-- BOTÕES DINÂMICOS (CARREGADOS DO FIREBASE) -->
+                    <div id="pub-categories" class="flex flex-col gap-3"></div>
+                    
+                </div>
             </div>
 
         </main>
 
         <footer class="text-center pb-8 opacity-40 hover:opacity-100 transition-opacity mt-4">
-            <button onclick="window.switchView('login')" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-center gap-1 mx-auto px-4 py-2 rounded-full hover:text-hinode-roxo transition-colors">
+            <button onclick="window.handleAdminAccess()" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-center gap-1 mx-auto px-4 py-2 rounded-full hover:text-hinode-roxo transition-colors">
                 <i class="ph-fill ph-lock-key"></i> Acesso Lojista
             </button>
         </footer>
@@ -463,7 +480,8 @@
         let currentUser = null;
         let currentLeadContext = '';
         let currentLeadData = '';
-        let isInitialLoad = true;
+        
+        let dataLoaded = false; 
 
         let allProducts = [];
 
@@ -564,25 +582,28 @@
             input.value = val;
         };
 
-        // --- INICIALIZAÇÃO E ROTAS BLINDADAS ---
+        window.handleAdminAccess = () => {
+            if (currentUser) {
+                window.switchView('admin');
+            } else {
+                window.switchView('login');
+            }
+        };
+
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if(isInitialLoad) {
-                isInitialLoad = false;
-                if(window.location.hash === '#admin') {
-                    if (user) window.switchView('admin'); 
-                    else window.switchView('login'); 
-                } else {
-                    window.switchView('public');
-                }
+            if (window.location.hash === '#admin') {
+                if (user) window.switchView('admin'); 
+                else window.switchView('login'); 
             } else {
-                if(!user && window.location.hash === '#admin') {
-                    window.switchView('login');
-                }
+                window.switchView('public');
             }
         });
 
         function loadDataFromFirebase() {
+            let settingsLoaded = false;
+            let productsLoaded = false;
+
             onSnapshot(doc(db, 'settings', 'linkNaBio'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -592,10 +613,13 @@
                     appData = data;
                 }
                 
-                if(window.location.hash !== '#admin') {
-                    renderPublicView();
-                } else if (currentUser) {
-                    renderAdminView();
+                settingsLoaded = true;
+                if(window.location.hash !== '#admin') renderPublicView();
+                else if (currentUser) renderAdminView();
+
+                if(settingsLoaded && productsLoaded && !dataLoaded) {
+                    dataLoaded = true;
+                    window.hideLoader();
                 }
             });
 
@@ -605,10 +629,13 @@
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
                 
-                if(window.location.hash !== '#admin') {
-                    renderPublicView();
-                } else if (currentUser) {
-                    renderAdminCatalog();
+                productsLoaded = true;
+                if(window.location.hash !== '#admin') renderPublicView();
+                else if (currentUser) renderAdminCatalog();
+
+                if(settingsLoaded && productsLoaded && !dataLoaded) {
+                    dataLoaded = true;
+                    window.hideLoader();
                 }
             });
         }
@@ -620,6 +647,10 @@
                 window.safeClassToggle('view-admin', 'flex', 'hidden');
                 window.location.hash = 'admin';
                 window.switchAdminTab('catalog'); 
+                
+                renderAdminView();
+                renderAdminCatalog();
+
             } else if (viewName === 'login') {
                 window.safeClassToggle('view-public', 'hidden', '');
                 window.safeClassToggle('view-admin', 'hidden', 'flex');
@@ -634,7 +665,7 @@
                 window.scrollTo(0, 0);
                 renderPublicView(); 
             }
-            window.hideLoader();
+            if(dataLoaded) window.hideLoader(); 
         };
 
         window.switchAdminTab = (tab) => {
@@ -683,7 +714,6 @@
             });
         };
 
-        // --- PUBLIC VIEWS (LINK NA BIO E MODAIS) ---
         function formatDateBR(dateString) {
             if (!dateString) return ''; const parts = dateString.split('-'); return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
@@ -748,7 +778,6 @@
             document.getElementById('modal-product-title').textContent = item.name;
             document.getElementById('modal-product-img').src = item.image || "https://placehold.co/400x300?text=Sem+Imagem";
             
-            // Removemos as quebras de linha em excesso e mostramos de forma harmoniosa
             const cleanNotes = item.notes ? item.notes.trim() : 'Sem descrição cadastrada.';
             
             document.getElementById('modal-product-details').innerHTML = `
@@ -775,8 +804,8 @@
             document.getElementById('pub-name').textContent = appData.name || '';
             document.getElementById('pub-role').textContent = appData.role || '';
             document.getElementById('pub-bio').textContent = appData.bio || '';
-            document.getElementById('pub-photo').src = appData.photoUrl || '';
-            document.getElementById('pub-logo').src = appData.logoUrl || '';
+            if(appData.photoUrl) document.getElementById('pub-photo').src = appData.photoUrl;
+            if(appData.logoUrl) document.getElementById('pub-logo').src = appData.logoUrl;
             
             const btnWpp = document.getElementById('pub-btn-whatsapp');
             if (appData.vacationMode && appData.vacationMode.active) {
@@ -793,7 +822,6 @@
             const offersSection = document.getElementById('pub-offers-section');
             offersContainer.innerHTML = '';
             
-            // Pega apenas os marcados para o Link na Bio
             const activeOffers = allProducts.filter(item => item.isActiveLink === true);
             
             if (activeOffers.length === 0) {
@@ -805,7 +833,6 @@
                     let imgHtml = item.image ? `<img src="${item.image}" class="w-full h-full object-contain">` : `<img src="https://placehold.co/400x300?text=Sem+Imagem" class="w-full h-full object-contain">`;
                     const tag = item.linkTag || 'OFERTA';
 
-                    // Limpa quebras de linha para o card não esticar
                     const cleanNotesCard = item.notes ? item.notes.replace(/\n/g, ' ').trim() : 'Sem descrição cadastrada.';
 
                     const offerHTML = `
@@ -847,13 +874,14 @@
                 if(iconName === 'perfume' || iconName === 'flask') iconName = 'gender-female'; 
                 if(iconName === 'sparkle') iconName = 'sparkles'; 
 
+                // Ajuste feito: text-base no título, text-xs no subtítulo e caixa de ícone menor
                 const catHTML = `
-                    <button onclick="window.openLeadModal('category', '${cat.title}')" class="w-full bg-white border-2 border-gray-100 p-4 rounded-2xl shadow-sm ${borderHover} transition-all flex items-center gap-4 group text-left">
-                        <div class="w-14 h-14 ${bgClass} rounded-xl flex items-center justify-center ${textClass} ${hoverBg} group-hover:text-white transition-colors flex-shrink-0">
-                            <i class="ph-fill ph-${iconName} text-3xl"></i>
+                    <button onclick="window.openLeadModal('category', '${cat.title}')" class="w-full bg-white border-2 border-gray-100 p-3.5 rounded-2xl shadow-sm ${borderHover} transition-all flex items-center gap-3 group text-left">
+                        <div class="w-12 h-12 ${bgClass} rounded-xl flex items-center justify-center ${textClass} ${hoverBg} group-hover:text-white transition-colors flex-shrink-0">
+                            <i class="ph-fill ph-${iconName} text-2xl"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-lg leading-tight mb-0.5">${cat.title}</h4>
+                            <h4 class="font-bold text-gray-800 text-base leading-tight mb-0.5">${cat.title}</h4>
                             <p class="text-xs text-gray-500 font-medium">${cat.subtitle}</p>
                         </div>
                         <i class="ph-bold ph-caret-right text-gray-300 group-hover:text-hinode-roxo transition-colors text-xl"></i>
@@ -927,7 +955,6 @@
             renderAdminCategories();
         }
 
-        // CATÁLOGO ADMIN INTEGRADO
         function renderAdminCatalog() {
             const list = document.getElementById('adm-catalog-list'); list.innerHTML = '';
             document.getElementById('catalog-count-badge').textContent = allProducts.length;
@@ -1012,7 +1039,6 @@
             }
         });
 
-        // RENDERIZAR CATEGORIAS (LINKS RÁPIDOS)
         function renderAdminCategories() {
             const list = document.getElementById('adm-categories-list'); list.innerHTML = '';
             appData.categories.forEach((cat, index) => {
@@ -1131,6 +1157,7 @@
             }
         };
 
+        window.showLoader("Carregando Link...");
         loadDataFromFirebase();
     </script>
 </body>
